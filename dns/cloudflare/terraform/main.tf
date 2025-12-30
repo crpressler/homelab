@@ -10,21 +10,23 @@ terraform {
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 3.0"
+      version = "5.15.0"
     }
   }
 }
 
-# provider "cloudflare" {
-#   api_token = var.cloudflare_api_token
-# }
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
+}
 
-# # Create a record
-# resource "cloudflare_record" "www" {
-#   # ...
-# }
+# Create records
+resource "cloudflare_dns_record" "test" {
+  zone_id = var.cloudflare_zone_id
+  name    = "tf-test"
+  type    = "A"
+  content = "1.2.3.4"
+  ttl     = 1
+  proxied = "false"
+  comment = "Testing Terraform functionality"
+}
 
-# # Create a page rule
-# resource "cloudflare_page_rule" "www" {
-#   # ...
-# }

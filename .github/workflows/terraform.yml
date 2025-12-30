@@ -57,6 +57,9 @@ jobs:
     name: 'Terraform Cloudflare DNS'
     runs-on: ubuntu-latest
     environment: production
+    env:
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
