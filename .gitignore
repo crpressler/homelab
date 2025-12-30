@@ -1,0 +1,30 @@
+# Terraform / OpenTofu
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/terraform.tfvars
+**/.terraformrc
+**/terraform.rc
+**/*.tfplan
+
+# Sensitive files
+**/*.pem
+**/*.key
+**/secrets.yml
+**/secrets.yaml
+**/.env
+**/.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/settings.local.json
+nul
