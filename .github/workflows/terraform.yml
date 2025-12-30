@@ -54,7 +54,7 @@ permissions:
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Terraform Cloudflare DNS'
     runs-on: ubuntu-latest
     environment: production
 
@@ -62,6 +62,7 @@ jobs:
     defaults:
       run:
         shell: bash
+        working-directory: dns/cloudflare/terraform
 
     steps:
     # Checkout the repository to the GitHub Actions runner
