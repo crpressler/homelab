@@ -6,12 +6,13 @@
 # 4. Run: tofu login
 
 terraform {
-  cloud {
+  backend "remote" {
     hostname     = "app.terraform.io"
     organization = "pressler-cloud"
+    token = "xxx.atlasv1.yyy"
 
     workspaces {
-      name = "homelab-dns-cloudflare"
+      name = "${TF_API_TOKEN}"
     }
   }
 }
