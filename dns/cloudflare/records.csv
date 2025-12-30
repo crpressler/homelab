@@ -1,9 +1,0 @@
-name,type,value,ttl,proxied,comment
-# Example records (uncomment and modify as needed):
-# @,A,192.0.2.1,3600,true,Main website
-# www,CNAME,example.com,3600,true,WWW subdomain
-# mail,A,192.0.2.2,3600,false,Mail server
-# _dmarc,TXT,v=DMARC1; p=none,3600,false,DMARC policy
-# @,MX,10 mail.example.com,3600,false,Mail exchanger
-
-mail,A,192.0.2.2,3600,false,Mail server
