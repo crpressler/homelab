@@ -5,3 +5,5 @@ name,type,value,ttl,proxied,comment
 # mail,A,192.0.2.2,3600,false,Mail server
 # _dmarc,TXT,v=DMARC1; p=none,3600,false,DMARC policy
 # @,MX,10 mail.example.com,3600,false,Mail exchanger
+
+mail,A,192.0.2.2,3600,false,Mail server

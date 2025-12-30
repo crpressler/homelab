@@ -7,7 +7,8 @@
 
 terraform {
   cloud {
-    organization = "your-organization-name"  # UPDATE THIS
+    hostname     = "app.terraform.io"
+    organization = "pressler-cloud"  # UPDATE THIS
 
     workspaces {
       name = "homelab-dns-cloudflare"

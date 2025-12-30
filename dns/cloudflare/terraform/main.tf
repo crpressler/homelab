@@ -44,7 +44,7 @@ provider "cloudflare" {
 
 # Read and parse the CSV file
 locals {
-  dns_records_csv = file(var.dns_records_file)
+  dns_records_csv = file("${path.module}/${var.dns_records_file}")
 
   # Parse CSV, skip header and comment lines
   dns_records_lines = [

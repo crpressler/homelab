@@ -22,17 +22,17 @@ Follow these steps to get your DNS management system up and running.
 
 ## Step 3: GitHub Repository Setup
 
-- [ ] Push this code to your GitHub repository
-- [ ] Go to Settings → Secrets and variables → Actions
-- [ ] Add secret: `TF_API_TOKEN` (from Step 1)
-- [ ] Add secret: `CLOUDFLARE_API_TOKEN` (from Step 2)
-- [ ] Add secret: `CLOUDFLARE_ZONE_ID` (from Step 2)
+- [x] Push this code to your GitHub repository
+- [x] Go to Settings → Secrets and variables → Actions
+- [x] Add secret: `TF_API_TOKEN` (from Step 1)
+- [x] Add secret: `CLOUDFLARE_API_TOKEN` (from Step 2)
+- [x] Add secret: `CLOUDFLARE_ZONE_ID` (from Step 2)
 - [ ] (Optional) Enable branch protection on `main` branch
 
 ## Step 4: Local Development Setup
 
-- [ ] Install OpenTofu: https://opentofu.org/docs/intro/install/
-- [ ] Clone repository locally
+- [x] Install OpenTofu: https://opentofu.org/docs/intro/install/
+- [x] Clone repository locally
 - [ ] Navigate to `dns/cloudflare/terraform/`
 - [ ] Run `tofu login` to authenticate with Terraform Cloud
 - [ ] Copy `terraform.tfvars.example` to `terraform.tfvars`
