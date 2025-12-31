@@ -1,17 +1,9 @@
-terraform {
-  required_version = ">= 1.6.0"
+# Main pressler.cloud zone records
 
-  required_providers {
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "5.15.0"
-    }
-  }
+locals {
+  zone_id = var.cloudflare_zone_id_pressler_cloud
 }
 
-provider "cloudflare" {
-  api_token = var.cloudflare_api_token
-}
 
 # # Create records
 # resource "cloudflare_dns_record" "resource_name" {
@@ -21,11 +13,11 @@ provider "cloudflare" {
 #   content = "1.2.3.4"
 #   ttl     = 1
 #   proxied = "false"
-#   comment = "owner=crpressler | source=manual | comment=Manually created test record"
+#   comment = "owner=crpressler | source=manual | comment=(Service if relevant) Manually created test record"
 # }
 
 resource "cloudflare_dns_record" "tf-test" {
-  zone_id = var.cloudflare_zone_id
+  zone_id = local.zone_id
   name    = "tf-test"
   type    = "A"
   content = "1.2.3.4"
