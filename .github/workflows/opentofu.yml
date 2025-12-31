@@ -1,0 +1,63 @@
+name: 'OpenTofu'
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  opentofu:
+    name: 'OpenTofu Cloudflare DNS'
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: dns/cloudflare/terraform
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Install the latest version of OpenTofu CLI and configure the OpenTofu CLI configuration file with a OpenTofu Cloud user API token
+    - name: Setup OpenTofu
+      id: setup
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_version: 1.11.0
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+    # Checks that all OpenTofu configuration files adhere to a canonical format
+    - name: OpenTofu Format
+      id: fmt
+      run: tofu fmt -check
+
+      # Initialize a new or existing OpenTofu working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: OpenTofu Init
+      id: init
+      run: tofu init
+
+      # Validate
+    - name: OpenTofu Validate
+      id: validate
+      run: tofu validate
+
+    # Generates an execution plan for OpenTofu
+    - name: OpenTofu Plan
+      id: plan
+      run: tofu plan
+
+      # On push to "main", build or change infrastructure according to OpenTofu configuration files
+      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    - name: OpenTofu Apply
+      id: apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: tofu apply -auto-approve -input=false
