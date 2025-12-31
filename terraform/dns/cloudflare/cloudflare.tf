@@ -4,7 +4,6 @@ locals {
   zone_id = var.cloudflare_zone_id_pressler_cloud
 }
 
-
 # # Create records
 # resource "cloudflare_dns_record" "resource_name" {
 #   zone_id = var.cloudflare_zone_id
