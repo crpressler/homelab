@@ -4,11 +4,11 @@ This repository manages my homelab infrastructure using Infrastructure as Code p
 
 ## DNS Management with Cloudflare
 
-Manage DNS records in Cloudflare using OpenTofu with a simple CSV file.
+Manage DNS records in Cloudflare using Terraform.
 
 ### Features
 
-- DNS records defined in a simple CSV format
+- DNS records defined in Terraform configuration
 - Automated deployment via GitHub Actions
 - Plan on Pull Requests, Apply on merge to main
 - State stored remotely in Terraform Cloud
@@ -22,24 +22,21 @@ Manage DNS records in Cloudflare using OpenTofu with a simple CSV file.
 homelab/
 ├── dns/
 │   └── cloudflare/
-│       ├── records.csv              # DNS records definition
+│       ├── records.csv              # DNS records definition (future use)
 │       └── terraform/
-│           ├── main.tf              # Main OpenTofu configuration
+│           ├── main.tf              # Main Terraform configuration with DNS records
 │           ├── variables.tf         # Variable definitions
-│           ├── outputs.tf           # Output definitions
-│           ├── backend.tf           # Remote state configuration
-│           └── terraform.tfvars.example # Example variables file
+│           └── terraform.tfvars     # Variable values (non-sensitive)
 └── .github/
     └── workflows/
-        ├── dns-plan.yml             # PR plan workflow
-        └── dns-apply.yml            # Main branch apply workflow
+        └── terraform.yml            # Terraform workflow (plan on PR, apply on merge)
 ```
 
 ## Setup Instructions
 
 ### Prerequisites
 
-- [OpenTofu](https://opentofu.org/) installed (v1.6+)
+- [Terraform](https://www.terraform.io/) installed (v1.6+)
 - Cloudflare account with a domain
 - Terraform Cloud account (free tier)
 - GitHub repository with Actions enabled

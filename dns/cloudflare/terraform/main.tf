@@ -1,12 +1,6 @@
 terraform {
-  cloud {
-    hostname     = "app.terraform.io"
-    organization = "pressler-cloud"
+  required_version = ">= 1.6.0"
 
-    workspaces {
-      name = "homelab-dns-cloudflare"
-    }
-  }
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
