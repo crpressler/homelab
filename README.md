@@ -4,11 +4,11 @@ This repository manages my homelab infrastructure using Infrastructure as Code p
 
 ## DNS Management with Cloudflare
 
-Manage DNS records in Cloudflare using Terraform.
+Manage DNS records in Cloudflare using OpenTofu.
 
 ### Features
 
-- DNS records defined in Terraform configuration
+- DNS records defined in OpenTofu configuration
 - Automated deployment via GitHub Actions
 - Plan on Pull Requests, Apply on merge to main
 - State stored remotely in Terraform Cloud
@@ -24,19 +24,19 @@ homelab/
 │   └── cloudflare/
 │       ├── records.csv              # DNS records definition (future use)
 │       └── terraform/
-│           ├── main.tf              # Main Terraform configuration with DNS records
+│           ├── main.tf              # Main OpenTofu configuration with DNS records
 │           ├── variables.tf         # Variable definitions
 │           └── terraform.tfvars     # Variable values (non-sensitive)
 └── .github/
     └── workflows/
-        └── terraform.yml            # Terraform workflow (plan on PR, apply on merge)
+        └── opentofu.yml             # OpenTofu workflow (plan on PR, apply on merge)
 ```
 
 ## Setup Instructions
 
 ### Prerequisites
 
-- [Terraform](https://www.terraform.io/) installed (v1.6+)
+- [OpenTofu](https://opentofu.org/) installed (v1.6+)
 - Cloudflare account with a domain
 - Terraform Cloud account (free tier)
 - GitHub repository with Actions enabled
@@ -64,7 +64,7 @@ homelab/
    - Go to your domain in Cloudflare
    - Scroll down on the Overview page
    - Copy the Zone ID
-   - Save it as a GitHub secret named `CLOUDFLARE_ZONE_ID`
+   - Save it as a terraform variable named `CLOUDFLARE_ZONE_ID`
 
 ### 3. Local Development Setup
 
@@ -93,7 +93,6 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 
 - `TF_API_TOKEN`: Your Terraform Cloud API token
 - `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token
-- `CLOUDFLARE_ZONE_ID`: Your Cloudflare zone ID
 
 ## Usage
 
@@ -112,8 +111,8 @@ mail,A,192.0.2.2,3600,false,Mail server
 ```
 
 **Complex records** (TXT with special characters, CAA, etc.):
-- Edit `dns/cloudflare/terraform/additional_records.tf`
-- Uncomment and modify the examples provided
+- Edit `dns/cloudflare/terraform/main.tf`
+- Add additional records using the OpenTofu resource syntax
 - Use this for records that break CSV parsing (commas, quotes, semicolons)
 
 ### CSV Format
@@ -171,20 +170,14 @@ tofu apply
 
 ## GitHub Actions Workflows
 
-### DNS Plan (`dns-plan.yml`)
+### OpenTofu (`opentofu.yml`)
 
-Triggers on pull requests that modify DNS files:
+Triggers on pull requests and pushes to main:
 - Runs `tofu fmt -check`
 - Runs `tofu init`
 - Runs `tofu validate`
 - Runs `tofu plan`
-- Posts plan output as a PR comment
-
-### DNS Apply (`dns-apply.yml`)
-
-Triggers on pushes to main branch:
-- Runs `tofu init`
-- Runs `tofu apply -auto-approve`
+- On merge to main: Runs `tofu apply -auto-approve`
 - Updates DNS records in Cloudflare
 
 ## Security Best Practices
