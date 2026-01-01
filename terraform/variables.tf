@@ -4,8 +4,7 @@ variable "cloudflare_api_token" {
   sensitive   = true
 }
 
-variable "cloudflare_zone_id" {
-  description = "Cloudflare zone id"
+variable "cloudflare_zone_id_pressler_cloud" {
+  description = "Zone ID for pressler.cloud"
   type        = string
-  sensitive   = true
 }
