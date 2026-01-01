@@ -6,39 +6,28 @@ This document provides context for Claude Code to effectively work with this rep
 
 This is a homelab infrastructure-as-code repository that manages DNS records in Cloudflare using OpenTofu (Terraform fork). The infrastructure is deployed automatically via GitHub Actions with a workflow that plans on PRs and applies on merge to main.
 
-## Known Issues
-
-### CRITICAL: GitHub Actions Workflow Path Mismatch
-
-The GitHub Actions workflow at [.github/workflows/opentofu.yml](.github/workflows/opentofu.yml#L23) is currently **broken** due to a path mismatch:
-
-- **Workflow working directory**: `dns/cloudflare/terraform` (does not exist)
-- **Actual file location**: `terraform/dns/cloudflare/`
-- **Impact**: CI/CD pipeline will fail when triggered
-- **Resolution Required**: Update the `working-directory` in `.github/workflows/opentofu.yml` line 23 to `terraform`
-
-This needs to be fixed in a separate task before the GitHub Actions workflow can function properly.
-
 ## Repository Structure
 
 ```
 homelab/
 ├── terraform/                    # Root terraform directory
 │   ├── dns/
-│   │   └── cloudflare/
+│   │   └── cloudflare/           # Cloudflare DNS module
 │   │       ├── cloudflare.tf     # Main DNS records configuration
+│   │       ├── variables.tf      # Module input variables (zone_id)
+│   │       ├── versions.tf       # Module provider requirements
 │   │       └── records-from-csv.tf # CSV processing (not implemented - empty file)
 │   ├── backend.tf                # Terraform Cloud backend configuration
-│   ├── providers.tf              # Cloudflare provider config
-│   ├── variables.tf              # Variable declarations
+│   ├── providers.tf              # Cloudflare provider config + requirements
+│   ├── variables.tf              # Root variable declarations
 │   ├── terraform.tfvars          # Variable values (Zone ID)
 │   ├── terraform.tfvars.example  # Example template
-│   ├── main.tf                   # Root module (empty placeholder)
+│   ├── main.tf                   # Root module - imports child modules
 │   ├── outputs.tf                # Outputs (empty placeholder)
 │   └── versions.tf               # Version constraints (empty placeholder)
 ├── .github/
 │   └── workflows/
-│       └── opentofu.yml          # CI/CD workflow (has path issue - see Known Issues)
+│       └── opentofu.yml          # CI/CD workflow
 ├── .gitignore                    # Git exclusion rules
 ├── LICENSE                       # MIT License
 ├── .env                          # Local environment variables (TF_VAR_cloudflare_api_token)
@@ -49,7 +38,8 @@ homelab/
 ## Current State
 
 - **DNS Records**: Currently one test record configured (`tf-test.pressler.cloud` → `1.2.3.4`)
-- **Empty Files**: `main.tf`, `versions.tf`, `outputs.tf`, `records-from-csv.tf` are placeholder files with no content
+- **Module Structure**: Using modular architecture - root `main.tf` imports `dns/cloudflare` child module
+- **Empty Files**: `versions.tf`, `outputs.tf`, `records-from-csv.tf` are placeholder files with no content
 - **CSV Management**: Not yet implemented
 - **Domain**: Managing `pressler.cloud` (Zone ID: `432d2dcc3c1531f7ad9c3cfeeedb7c83`)
 
@@ -65,11 +55,17 @@ homelab/
 
 ### Infrastructure Files
 
-- [terraform/dns/cloudflare/cloudflare.tf](terraform/dns/cloudflare/cloudflare.tf): Main OpenTofu configuration containing DNS record resources
-- [terraform/variables.tf](terraform/variables.tf): Variable declarations for the Cloudflare provider
+#### Root Module
+- [terraform/main.tf](terraform/main.tf): Root module that imports child modules (dns/cloudflare)
+- [terraform/variables.tf](terraform/variables.tf): Root variable declarations (api_token, zone_id)
 - [terraform/backend.tf](terraform/backend.tf): Terraform Cloud backend configuration
-- [terraform/providers.tf](terraform/providers.tf): Provider configuration
+- [terraform/providers.tf](terraform/providers.tf): Provider configuration and requirements
 - [terraform/terraform.tfvars](terraform/terraform.tfvars): Variable values (Zone ID)
+
+#### dns/cloudflare Module
+- [terraform/dns/cloudflare/cloudflare.tf](terraform/dns/cloudflare/cloudflare.tf): DNS record resources
+- [terraform/dns/cloudflare/variables.tf](terraform/dns/cloudflare/variables.tf): Module input variables (receives zone_id from root)
+- [terraform/dns/cloudflare/versions.tf](terraform/dns/cloudflare/versions.tf): Module provider requirements
 - [terraform/dns/cloudflare/records-from-csv.tf](terraform/dns/cloudflare/records-from-csv.tf): Logic for processing CSV-based DNS records (not implemented)
 
 ### CI/CD
@@ -80,7 +76,7 @@ homelab/
   - Validates configuration
   - Plans changes on all PRs and pushes
   - Auto-applies on merge to main branch
-  - **NOTE**: Currently has incorrect working directory path (see Known Issues)
+  - Working directory: `terraform/`
 
 ## Important Conventions
 
@@ -163,9 +159,8 @@ tofu plan   # Preview changes
 3. Commit changes with descriptive messages
 4. Push to origin: `git push -u origin <branch-name>`
 5. Create a Pull Request
-6. **NOTE**: GitHub Actions will currently fail due to path issue (see Known Issues)
-7. Review the plan output (once workflow is fixed)
-8. Merge PR to trigger automatic apply
+6. Review the plan output in GitHub Actions
+7. Merge PR to trigger automatic apply
 
 ## Important Notes for Claude Code
 
@@ -178,7 +173,8 @@ tofu plan   # Preview changes
 - **Reference local.zone_id**: Don't hardcode zone IDs, use the local variable
 - **Avoid over-engineering**: Keep changes simple and focused on the request
 - **Don't add unnecessary features**: Only implement what's requested
-- **Empty files are intentional**: Don't populate `main.tf`, `versions.tf`, `outputs.tf` unless specifically requested
+- **Module structure**: DNS records go in `dns/cloudflare/cloudflare.tf`, not root module
+- **Provider config**: Only configure providers in root `providers.tf`, modules only declare requirements in `versions.tf`
 
 ### Git Operations
 
@@ -203,10 +199,13 @@ tofu plan   # Preview changes
 - **State management**: Handled by Terraform Cloud - never commit state files
 - **Backend**: Configured in [terraform/backend.tf](terraform/backend.tf) - don't modify without coordination
 - **Working directory**: Root is `terraform/` - not `dns/cloudflare/terraform/`
+- **Module architecture**: Root module in `terraform/main.tf` imports child modules
+- **Provider inheritance**: Child modules inherit provider config from root - only declare `required_providers` in module `versions.tf`
+- **Variable passing**: Root variables passed to modules via module block parameters in `main.tf`
 
 ## Testing Strategy
 
-- **Automated**: GitHub Actions runs fmt check, init, validate, and plan on all PRs (currently broken - see Known Issues)
+- **Automated**: GitHub Actions runs fmt check, init, validate, and plan on all PRs
 - **Manual**: Local testing with `tofu plan` before pushing
 - **Deployment verification**: Check Cloudflare dashboard after apply to confirm changes
 
@@ -219,8 +218,8 @@ tofu plan   # Preview changes
 3. **Plan fails**: Validate configuration locally with `tofu validate`
 4. **State lock errors**: Check Terraform Cloud workspace for stuck locks
 5. **Push fails with 403**: Ensure branch name starts with `claude/` and ends with session ID
-6. **GitHub Actions fails**: See Known Issues section - workflow path needs fixing
-7. **Cannot find terraform files**: Files are in `terraform/` directory, not `dns/cloudflare/terraform/`
+6. **Provider not found (hashicorp/cloudflare)**: Child modules need `versions.tf` with `required_providers` block pointing to `cloudflare/cloudflare`
+7. **Resource recreating after module refactor**: Use `terraform state mv <old_address> module.<module_name>.<resource>` to move state
 
 ## Future Enhancements
 
@@ -231,7 +230,6 @@ Planned improvements include:
 - Pre-commit hooks for validation
 - Bulk record management scripts
 - Monitoring/alerting for DNS changes
-- Fix GitHub Actions workflow path issue
 
 ## Resources
 
